@@ -93,9 +93,179 @@ m = pow(c, d)
 m = math.fmod(m, n)
 print("Original Message Sent = ", m)
 
+--------------------DES-----------------------------------------------
+import base32hex
+import hashlib
+from Crypto.Cipher import DES
+
+password = "Password"
+salt = '\x28\xAB\xBC\xCD\xDE\xEF\x00\x33'
+key = password + salt
+m = hashlib.md5(key)
+key = m.digest()
+(dk, iv) = (key[:8], key[8:])
+crypter = DES.new(dk, DES.MODE_CBC, iv)
+
+plain_text = "I see you"
+
+print("The plain text is : ", plain_text)
+plain_text += '\x00' * (8 - len(plain_text) % 8)
+ciphertext = crypter.encrypt(plain_text)
+encode_string = base32hex.b32encode(ciphertext)
+print("The encoded string is : ", encode_string)
+
+
+----------------------------------Wilcard mask--------------------------------------
+Subnet mask: 255.255.255.224
+Wildcard mask: 0.0.0.31
+
+Subnet mask: 255.255.255.240
+Wildcard mask: 0.0.0.15
+
+Subnet mask: 255.255.255.192
+Wildcard mask: 0.0.0.63
+
+
+-----------------------Vernam Cipher---------------------------------
+
+def stringEncryption(text, key):
+	
+	cipherText = ""
+
+	
+	cipher = []
+	for i in range(len(key)):
+		cipher.append(ord(text[i]) - ord('A') + ord(key[i])-ord('A'))
+
+
+	for i in range(len(key)):
+		if cipher[i] > 25:
+			cipher[i] = cipher[i] - 26
+
+	
+	for i in range(len(key)):
+		x = cipher[i] + ord('A')
+		cipherText += chr(x)
+
+
+	return cipherText
+
+
+
+def stringDecryption(s, key):
+
+	
+	plainText = ""
+
+
+
+	plain = []
+
+
+
+	for i in range(len(key)):
+		plain.append(ord(s[i]) - ord('A') - (ord(key[i]) - ord('A')))
+
+	
+	for i in range(len(key)):
+		if (plain[i] < 0):
+			plain[i] = plain[i] + 26
+
+
+
+	for i in range(len(key)):
+		x = plain[i] + ord('A')
+		plainText += chr(x)
+
+
+	return plainText
+
+
+plainText = "Hello"
+
+
+key = "MONEY"
+
+
+
+encryptedText = stringEncryption(plainText.upper(), key.upper())
+
+
+print("Cipher Text - " + encryptedText)
+
+
+print("Message - " + stringDecryption(encryptedText, key.upper()))
+
+
+--------------------------- DES Algorithm ---------------------------------
+
+import base32hex
+import hashlib
+from Crypto.Cipher import DES
+password = "Password"
+salt = '\x28\xAB\xBC\xCD\xDE\xEF\x00\x33'
+key = password + salt
+m = hashlib.md5(key)
+key = m.digest()
+(dk, iv) =(key[:8], key[8:])
+crypter = DES.new(dk, DES.MODE_CBC, iv)
+
+plain_text= "I see you"
+
+print("The plain text is : ",plain_text)
+plain_text += '\x00' * (8 - len(plain_text) % 8)
+ciphertext = crypter.encrypt(plain_text)
+encode_string= base32hex.b32encode(ciphertext)
+print("The encoded string is : ",encode_string)
+
+
+
+------------Diffie-Hellman-------------------------
+
+import random
+
+# Shared prime and base values (these should be agreed upon by both parties)
+prime = 23
+base = 5
+
+# Generate a random private key for each party
+private_key_A = random.randint(1, 100)
+private_key_B = random.randint(1, 100)
+
+# Calculate public keys for both parties
+public_key_A = (base ** private_key_A) % prime
+public_key_B = (base ** private_key_B) % prime
+
+# Simulate the exchange of public keys (in a real-world scenario, this should be done securely)
+shared_secret_key_A = (public_key_B ** private_key_A) % prime
+shared_secret_key_B = (public_key_A ** private_key_B) % prime
+
+# The shared_secret_key_A and shared_secret_key_B should be equal and can be used as a symmetric key
+print("Shared Secret Key (Party A):", shared_secret_key_A)
+print("Shared Secret Key (Party B):", shared_secret_key_B)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -------------------- Cisco Packet Tracer--------------------------------
 
-Practical 01 
+---------------Practical 01 ----------------------------------------
 
 
 
@@ -190,7 +360,7 @@ PC> ssh –l SSHadmin 192.168.3.1
 R2# ssh –v 2 –l SSHadmin 10.2.2.1
 
 
-Practical 02
+-------------------------------- Practical 02 AAA ------------------------------------
 
 1] 
 
@@ -244,6 +414,31 @@ Username: Admin3
 Password: admin3pa55 
 R3>
 
+-----------------Practical 04 Firewall---------------------------------------------
+
+R3(config)# license boot module c1900 technology-package securityk9 
+R3(config)# zone security IN-ZONE
+R3(config-sec-zone) exit
+R3(config-sec-zone)# zone security OUT-ZONE
+ R3(config-seczone)# exit 
+R3(config)# access-list 101 permit ip 192.168.3.0 0.0.0.255 any
+R3(config)# class-map type inspect match-all IN-NET-CLASS-MAP R3(config-cmap)# match access-group 101 R3(config-cmap)# exit
+R3(config)# policy-map type inspect IN-2-OUT-PMAP
+R3(config-pmap)# class type inspect IN-NET-CLASS-MAP
+R3(config-pmap-c)# inspect
+R3(config-pmap-c)# exit
+R3(config-pmap)# exit
+R3(config)# zone-pair security IN-2-OUT-ZPAIR source IN-ZONE destination OUTZONE
+R3(config-sec-zone-pair)# service-policy type inspect IN-2-OUT-PMAP
+R3(config-sec-zone-pair)# exit
+R3(config)# 
+R3(config)# interface g0/1
+R3(config-if)# zone-member security IN-ZONE
+R3(config-if)# exit
+R3(config)# interface s0/0/1
+R3(config-if)# zone-member security OUT-ZONE 
+R3(config-if)#exit
+R3# show policy-map type inspect zone-pair sessions
 
 
 
