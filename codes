@@ -93,6 +93,163 @@ m = pow(c, d)
 m = math.fmod(m, n)
 print("Original Message Sent = ", m)
 
+-------------------- Cisco Packet Tracer--------------------------------
+
+Practical 01 
+
+
+
+
+1]
+
+R1(config)# router ospf 1
+R1(config-router)# area 0 authentication message-digest
+R2(config)# router ospf 1
+R2(config-router)# area 0 authentication message-digest
+R3(config)# router ospf 1
+R3(config-router)# area 0 authentication message-digest
+
+2] 
+
+R1(config)# interface s0/0/0
+R1(config-if)# ip ospf message-digest-key 1 md5 MD5pa55
+R2(config)# interface s0/0/0
+R2(config-if)# ip ospf message-digest-key 1 md5 MD5pa55
+R2(config-if)# interface s0/0/1
+R2(config-if)# ip ospf message-digest-key 1 md5 MD5pa55
+R3(config)# interface s0/0/1
+R3(config-if)# ip ospf message-digest-key 1 md5 MD5pa55
+
+3] 
+ 
+On PC-A, click NTP under the Services tab to verify NTP service is enabled.
+
+To configure NTP authentication, click Enable under Authentication. Use key 1 and password NTPpa55 for authentication. 
+
+R1(config)# ntp server 192.168.1.5
+R2(config)# ntp server 192.168.1.5
+R3(config)# ntp server 192.168.1.5
+
+4] 
+
+R1(config)# ntp update-calendar
+R2(config)# ntp update-calendar
+R3(config)# ntp update-calendar
+
+5] 
+
+R1(config)# ntp authenticate
+R1(config)# ntp trusted-key 1
+R1(config)# ntp authentication-key 1 md5 NTPpa55
+R2(config)# ntp authenticate
+R2(config)# ntp trusted-key 1
+R2(config)# ntp authentication-key 1 md5 NTPpa55
+R3(config)# ntp authenticate
+R3(config)# ntp trusted-key 1
+R3(config)# ntp authentication-key 1 md5 NTPpa55
+
+6] 
+
+R1(config)# service timestamps log datetime msec
+R2(config)# service timestamps log datetime msec
+R3(config)# service timestamps log datetime msec
+
+7]
+
+R1(config)# logging host 192.168.1.6
+R2(config)# logging host 192.168.1.6
+R3(config)# logging host 192.168.1.6
+
+8] 
+
+R3(config)# ip domain-name ccnasecurity.com
+R3(config)# line vty 0 4
+R3(config-line)# login local
+R3(config-line)# transport input ssh
+
+9] 
+
+R3(config)# crypto key zeroize rsa
+R3(config)# crypto key generate rsa
+
+How many bits in the modulus [512]: 1024
+% Generating 1024 bit RSA keys, keys will be non-exportable...[OK]
+
+10] 
+
+R3(config)# ip ssh time-out 90
+R3(config)# ip ssh authentication-retries 2
+R3(config)# ip ssh version 2
+
+11] 
+
+From PC-C:
+PC> telnet 192.168.3.1
+PC> ssh –l SSHadmin 192.168.3.1
+
+R2# ssh –v 2 –l SSHadmin 10.2.2.1
+
+
+Practical 02
+
+1] 
+
+R1(config)# username Admin1 secret admin1pa55
+R1(config)# aaa new-model
+R1(config)# aaa authentication login default local
+R1(config)# line console 0 
+R1(config-line)# login authentication default 
+R1(config-line)# end
+%SYS-5-CONFIG_I: Configured from console by console
+R1# exit
+User Access Verification
+Username: Admin1
+Password: admin1pa55 
+R1>
+R1(config)# ip domain-name ccnasecurity.com
+R1(config)# crypto key generate rsa
+R1(config)# aaa authentication login SSH-LOGIN local
+R1(config)# line vty 0 4
+R1(config-line)# login authentication SSH-LOGIN
+R1(config-line)# transport input ssh 
+R1(config-line)#end
+PC> ssh –l Admin1 192.168.1.1
+Open
+Password: admin1pa55
+
+
+2] 
+
+R2(config)# username Admin2 secret admin2pa55
+R2(config)# aaa new-model
+R2(config)# aaa authentication login default group tacacs+ local
+R2(config)# line console 0
+R2(config-line)# login authentication default
+R2(config-line)# end
+R2# exit
+Username: Admin2
+Password: admin2pa55
+R2>
+
+3] 
+
+R3(config)# username Admin3 secret admin3pa55
+R3(config)# aaa new-model
+R3(config)# aaa authentication login default group radius local
+R3(config)# line console 0
+R3(config-line)# login authentication default
+R3(config-line)# end
+R3# exit
+Username: Admin3
+Password: admin3pa55 
+R3>
+
+
+
+
+
+
+
 
 
 
